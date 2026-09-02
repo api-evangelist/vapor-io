@@ -1,0 +1,69 @@
+generated: '2026-09-02'
+method: derived
+source: https://synse.readthedocs.io/en/latest/server/api.v3/ (no MCP server published)
+provider: Vapor IO
+status: candidate
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: derived
+note: Vapor IO ships no MCP server. Searched the vapor-ware GitHub organization (64 public repositories,
+  none MCP-related), the Synse documentation site and the vaporio Docker Hub organization; nothing hosted,
+  nothing stdio. No MCPServer pointer is wired into apis.yml, because a pointer would assert an agent
+  surface the provider does not operate. The tools below are a DERIVED candidate list showing what an
+  MCP server over the Synse Server v3 API would expose — they are not implemented by anyone.
+derived_from: https://synse.readthedocs.io/en/latest/server/api.v3/
+candidate_tools:
+- name: synse_status
+  rest: GET /test
+  description: Check that a Synse Server instance is reachable and ready.
+- name: synse_version
+  rest: GET /version
+  description: Get the server version and the API version to use in subsequent requests.
+- name: synse_config
+  rest: GET /v3/config
+  description: Get the unified runtime configuration of the server instance.
+- name: synse_list_plugins
+  rest: GET /v3/plugin
+  description: Summarize all plugins registered with the server.
+- name: synse_plugin_info
+  rest: GET /v3/plugin/{plugin}
+  description: Get detailed metadata for one registered plugin.
+- name: synse_plugin_health
+  rest: GET /v3/plugin/health
+  description: Get the health summary for registered plugins.
+- name: synse_scan
+  rest: GET /v3/scan
+  description: List every device Synse knows about, filterable by tag.
+- name: synse_tags
+  rest: GET /v3/tags
+  description: List the tags currently associated with devices.
+- name: synse_device_info
+  rest: GET /v3/info/{device}
+  description: Get the full metadata and capabilities of one device.
+- name: synse_read
+  rest: GET /v3/read
+  description: Read current values from every device matching a tag set.
+- name: synse_read_device
+  rest: GET /v3/read/{device}
+  description: Read current values from one device.
+- name: synse_read_cache
+  rest: GET /v3/readcache
+  description: Stream cached readings within an optional time window.
+- name: synse_write_async
+  rest: POST /v3/write/{device}
+  description: 'Write an action to a device and return a transaction ID. DESTRUCTIVE: writes act on physical
+    hardware.'
+- name: synse_write_sync
+  rest: POST /v3/write/wait/{device}
+  description: 'Write an action to a device and block until it resolves. DESTRUCTIVE: writes act on physical
+    hardware.'
+- name: synse_transaction
+  rest: GET /v3/transaction/{transaction}
+  description: Check the status of a write transaction.
+- name: synse_transactions
+  rest: GET /v3/transaction
+  description: List all tracked transaction IDs.

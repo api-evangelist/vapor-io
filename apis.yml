@@ -1,23 +1,175 @@
 aid: vapor-io
 name: Vapor IO
-description: 'Vapor IO is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'Vapor IO is an Austin, Texas edge computing company that builds and operates
+  the Kinetic Grid, a carrier-neutral network of micro modular data centers offering
+  edge colocation, interconnection, networking and network-delivered AI across dozens
+  of US markets and, through a Cellnex partnership, into Europe. Its public, machine-readable
+  developer surface is the open source Synse platform, published under the vapor-ware
+  GitHub organization: Synse Server, a uniform HTTP and WebSocket API for monitoring
+  and controlling physical and virtual devices (data center equipment, IoT devices,
+  building management systems, edge hardware), and the Synse plugin gRPC API, whose
+  Protocol Buffers contract is published in full. Protocol-specific plugins cover IPMI,
+  SNMP, Modbus over TCP/IP, Intel AMT and Juniper JTI, with Go and Python SDKs, a Go
+  CLI, Helm charts and Docker images. Kinetic Grid Portal telemetry is described as
+  API-accessible but is documented only to customers.'
+image: https://www.vapor.io/wp-content/uploads/2021/06/cropped-1-Fav.png
 url: https://raw.githubusercontent.com/api-evangelist/vapor-io/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-09-02'
 modified: '2026-09-02'
 tags:
 - Company
-apis: []
+- Edge Computing
+- Data Centers
+- Colocation
+- Infrastructure
+- Device Management
+- Monitoring
+- Telemetry
+- IoT
+- gRPC
+- Open Source
+- Kubernetes
+apis:
+- aid: vapor-io:synse-server
+  name: Synse Server API (v3)
+  description: 'Synse Server exposes a uniform HTTP and WebSocket API for reading from
+    and writing to physical and virtual devices through protocol-specific plugins.
+    The same 18 operations are available over both transports: status, version, config,
+    plugin summary/detail/health, device scan, tags, device info, read, read-by-device,
+    read cache, streamed readings (WebSocket only), asynchronous and synchronous writes,
+    and transaction status. Synse Server is self-hosted; the base URL is the host and
+    port of the operator''s own deployment, which defaults to port 5000.'
+  humanURL: https://synse.readthedocs.io/en/latest/server/api.v3/
+  baseURL: http://{synse-server-host}:5000
+  tags:
+  - Device Management
+  - Monitoring
+  - Telemetry
+  - Edge Computing
+  - IoT
+  properties:
+  - type: Documentation
+    url: https://synse.readthedocs.io/en/latest/server/intro/
+  - type: APIReference
+    url: https://synse.readthedocs.io/en/latest/server/api.v3/
+  - type: GettingStarted
+    url: https://synse.readthedocs.io/en/latest/server/user/quickstart/
+  - type: SourceCode
+    url: https://github.com/vapor-ware/synse-server
+  - type: ErrorCatalog
+    url: errors/vapor-io-problem-types.yml
+  - type: Conventions
+    url: conventions/vapor-io-conventions.yml
+  - type: DataModel
+    url: data-model/vapor-io-data-model.yml
+  - type: RateLimits
+    url: rate-limits/vapor-io-rate-limits.yml
+- aid: vapor-io:synse-plugin-grpc
+  name: Synse Plugin gRPC API (V3Plugin)
+  description: 'The internal gRPC API for bi-directional communication between Synse
+    Server and Synse plugins. The published Protocol Buffers contract defines the V3Plugin
+    service with 12 RPCs — Devices, Health, Metadata, Read, ReadCache, ReadStream,
+    Test, Transaction, Transactions, Version, WriteAsync and WriteSync — six of which
+    return server streams, plus 24 messages and three enums. Plugins are self-hosted
+    and listen on port 5001 by default.'
+  humanURL: https://github.com/vapor-ware/synse-server-grpc
+  baseURL: grpc://{synse-plugin-host}:5001
+  tags:
+  - gRPC
+  - Device Management
+  - Telemetry
+  properties:
+  - type: Protobuf
+    url: grpc/vapor-io-synse-v3plugin.proto
+  - type: SourceCode
+    url: https://github.com/vapor-ware/synse-server-grpc
+  - type: Documentation
+    url: https://synse.readthedocs.io/en/latest/sdk/architecture/
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DomainSecurity
+  url: security/vapor-io-domain-security.yml
 - type: Website
-  url: https://forgeglobal.com/vapor-io_stock/
+  url: https://www.vapor.io/
+- type: Documentation
+  url: https://synse.readthedocs.io/en/latest/
+- type: APIReference
+  url: https://synse.readthedocs.io/en/latest/server/api.v3/
+- type: GettingStarted
+  url: https://synse.readthedocs.io/en/latest/server/user/quickstart/
+- type: GitHubOrganization
+  url: https://github.com/vapor-ware
+- type: Blog
+  url: https://www.vapor.io/resources/blog/
+- type: BlogRSS
+  url: https://www.vapor.io/feed/
+- type: Support
+  url: https://github.com/vapor-ware/synse-server/issues
+- type: Contact
+  url: https://www.vapor.io/contact/
+- type: TermsOfService
+  url: https://www.vapor.io/legal/website-terms-of-use/
+- type: PrivacyPolicy
+  url: https://www.vapor.io/legal/privacy-policy/
+- type: License
+  url: https://synse.readthedocs.io/en/latest/license/
+- type: Protobuf
+  url: grpc/vapor-io-synse-v3plugin.proto
+- type: Packages
+  url: packages/vapor-io-packages.yml
+- type: SDKs
+  url: packages/vapor-io-packages.yml
+- type: CLI
+  url: cli/vapor-io-cli.yml
+- type: Sandbox
+  url: sandbox/vapor-io-sandbox.yml
+- type: Authentication
+  url: authentication/vapor-io-authentication.yml
+- type: ErrorCatalog
+  url: errors/vapor-io-problem-types.yml
+- type: Conventions
+  url: conventions/vapor-io-conventions.yml
+- type: Lifecycle
+  url: lifecycle/vapor-io-lifecycle.yml
+- type: ChangeLog
+  url: changelog/vapor-io-changelog.yml
+- type: Conformance
+  url: conformance/vapor-io-conformance.yml
+- type: DataModel
+  url: data-model/vapor-io-data-model.yml
+- type: RateLimits
+  url: rate-limits/vapor-io-rate-limits.yml
+- type: Plans
+  url: plans/vapor-io-plans-pricing.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/vapor-io-llms.txt
+x-enrichment:
+  date: '2026-09-02'
+  status: enriched
+  artifacts_added: 23
+  pass: local-v1
+x-coverage:
+  state: covered
+  reason: covered
+  detail: >-
+    Vapor IO publishes a real machine-readable contract — the Synse V3Plugin Protocol Buffers
+    file, 12 RPCs, harvested verbatim — plus a complete HTTP/WebSocket API reference, first-party
+    Go and Python clients, a Go CLI and container images. No OpenAPI exists anywhere on any host
+    or in the vapor-ware organization, so the REST surface is documented in markdown only.
+  evidence:
+  - url: https://raw.githubusercontent.com/vapor-ware/synse-server-grpc/master/synse.proto
+    status: 200
+  - url: https://synse.readthedocs.io/en/latest/server/api.v3/
+    status: 200
+  - url: https://synse.readthedocs.io/openapi.json
+    status: 404
+  checked: '2026-09-02'

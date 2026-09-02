@@ -1,0 +1,94 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/server/api.v3/#websocket-api
+provider: Vapor IO
+api: Synse Server API (v3) — WebSocket
+asyncapi_document: null
+webhooks: false
+pointer_emitted: false
+note: 'Synse Server ships a real bidirectional event surface — a WebSocket API at ws://{synse-server-host}:5000/v3/connect
+  with a published catalog of 17 request events, their response events, and a `response/error` event —
+  and the ReadStream RPC in synse.proto streams readings from plugins as they are produced. But NO AsyncAPI
+  document is published (org-wide code search for ''asyncapi'' across vapor-ware returns zero results),
+  and there is NO webhook surface: Synse never calls out to a subscriber URL, it only serves clients that
+  connect to it. Neither the AsyncAPI nor the Webhooks canonical pointer is therefore wired in apis.yml
+  — claiming either would assert a document or a callback mechanism the provider does not publish. This
+  file records the event catalog verbatim so the surface is not invisible.'
+channel:
+  protocol: websocket
+  url: ws://{synse-server-host}:5000/v3/connect
+  message_envelope:
+    id: int — client-assigned, incremented per session, reflected by the server so responses match requests;
+      -1 on a request that could not be parsed
+    event: string — request/* from the client, response/* from the server
+    data: object — request parameters (URI + query params by name; POST bodies under `payload`), or the
+      response payload
+events:
+- request: request/status
+  response: response/status
+  http_equivalent: GET /test
+- request: request/version
+  response: response/version
+  http_equivalent: GET /version
+- request: request/config
+  response: response/config
+  http_equivalent: GET /v3/config
+- request: request/plugin
+  response: response/plugin_info
+  http_equivalent: GET /v3/plugin/{plugin}
+- request: request/plugins
+  response: response/plugin_summary
+  http_equivalent: GET /v3/plugin
+- request: request/plugin_health
+  response: response/plugin_health
+  http_equivalent: GET /v3/plugin/health
+- request: request/scan
+  response: response/device_summary
+  http_equivalent: GET /v3/scan
+- request: request/tags
+  response: response/tags
+  http_equivalent: GET /v3/tags
+- request: request/info
+  response: response/device_info
+  http_equivalent: GET /v3/info/{device}
+- request: request/read
+  response: response/reading
+  http_equivalent: GET /v3/read
+- request: request/read_device
+  response: response/reading
+  http_equivalent: GET /v3/read/{device}
+- request: request/read_cache
+  response: response/reading
+  http_equivalent: GET /v3/readcache
+- request: request/read_stream
+  response: response/reading
+  http_equivalent: null
+  note: WebSocket only. The docs say streamed readings will come to HTTP when HTTP/2 support allows.
+- request: request/write_async
+  response: response/transaction_info
+  http_equivalent: POST /v3/write/{device}
+- request: request/write_sync
+  response: response/transaction_status
+  http_equivalent: POST /v3/write/wait/{device}
+- request: request/transaction
+  response: response/transaction_status
+  http_equivalent: GET /v3/transaction/{transaction}
+- request: request/transactions
+  response: response/transaction_list
+  http_equivalent: GET /v3/transaction
+error_event:
+  event: response/error
+  note: Any request may return this. Envelope documented in errors/vapor-io-problem-types.yml.
+grpc_streams:
+- rpc: ReadStream
+  note: Returns reading data for the specified devices as they are read by the plugin.
+- rpc: Read
+  note: Server stream of readings.
+- rpc: ReadCache
+  note: Server stream of cached readings.
+- rpc: Devices
+  note: Server stream of devices.
+- rpc: WriteAsync
+  note: Server stream of write transactions.
+- rpc: WriteSync
+  note: Server stream of transaction statuses.

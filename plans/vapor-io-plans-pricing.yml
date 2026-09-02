@@ -1,0 +1,32 @@
+generated: '2026-09-02'
+method: searched
+source: https://www.vapor.io/pricing/ (HTTP 500), https://www.vapor.io/legal/, https://synse.readthedocs.io/en/latest/license/
+provider: Vapor IO
+plan_count: 0
+note: 'Vapor IO publishes no plans and no prices. The Kinetic Grid is sold as edge colocation, interconnection
+  and network services through a sales motion — commercial terms live in the Master Services Agreement
+  and Service Schedules on https://www.vapor.io/legal/, not on a pricing page. https://www.vapor.io/pricing/
+  exists as a route but returned HTTP 500 on 2026-09-02, so there is not even a broken tier list to read;
+  it is not linked from the site navigation and no Pricing pointer is wired in apis.yml. The Synse platform
+  is separately free: it is open source under GPL-3.0 with no commercial tier, no metering and no paid
+  support offering published.'
+plans: []
+commercial_model: contact-sales
+evidence:
+- url: https://www.vapor.io/pricing/
+  status: 500
+- url: https://www.vapor.io/legal/master-services-agreement-msa/
+  status: 200
+- url: https://www.vapor.io/contact/
+  status: 200
+- url: https://synse.readthedocs.io/en/latest/license/
+  status: 200
+open_source:
+  license: GPL-3.0
+  cost: free
+  components:
+  - synse-server
+  - synse-sdk
+  - synse-server-grpc
+  - synse-cli
+  - synse plugins

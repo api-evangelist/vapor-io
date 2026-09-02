@@ -1,0 +1,64 @@
+generated: '2026-09-02'
+method: probed
+source: live probes of www.vapor.io and synse.readthedocs.io
+note: Every /.well-known/ path probed on both Vapor IO hosts returned 404. www.vapor.io serves a WordPress
+  404 page for these paths (and a plain nginx 404 for security.txt); synse.readthedocs.io serves the Read
+  the Docs 404 page. No WellKnown or SecurityTxt pointer is emitted in apis.yml, because this file records
+  an absence, not a served surface.
+hosts:
+- host: www.vapor.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+- host: synse.readthedocs.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+other_probes:
+- url: https://www.vapor.io/llms.txt
+  status: 404
+- url: https://www.vapor.io/openapi.json
+  status: 403
+  note: Cloudflare edge block, not a document
+- url: https://synse.readthedocs.io/openapi.json
+  status: 404
+- url: https://synse.readthedocs.io/llms.txt
+  status: 404

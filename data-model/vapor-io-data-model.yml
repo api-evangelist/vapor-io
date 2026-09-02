@@ -1,0 +1,176 @@
+generated: '2026-09-02'
+method: derived
+source: grpc/vapor-io-synse-v3plugin.proto
+provider: Vapor IO
+derived_from:
+- grpc/vapor-io-synse-v3plugin.proto
+- https://synse.readthedocs.io/en/latest/server/api.v3/
+note: 'The entity graph of the Synse platform, derived from the 24 messages in the published Protocol
+  Buffers contract and the response-data sections of the v3 API reference. Device ids are deterministic:
+  the platform overview lists ''Deterministic IDs for devices configured in a Synse deployment'' as one
+  of the three things Synse provides, so the same device in the same deployment always resolves to the
+  same id.'
+entities:
+- name: Plugin
+  proto: V3Metadata
+  id_field: id
+  description: A protocol adapter registered with the server; marked active or inactive by reachability.
+  fields:
+  - id
+  - name
+  - maintainer
+  - tag
+  - description
+  - vcs
+- name: PluginHealth
+  proto: V3Health
+  description: Aggregate health of a plugin, composed of individual checks.
+  fields:
+  - status
+  - timestamp
+  - checks
+- name: HealthCheck
+  proto: V3HealthCheck
+  fields:
+  - name
+  - status
+  - message
+  - timestamp
+  - type
+- name: Device
+  proto: V3Device
+  id_field: id
+  description: A physical or virtual device exposed by a plugin.
+  fields:
+  - id
+  - alias
+  - type
+  - plugin
+  - info
+  - metadata
+  - tags
+  - outputs
+  - capabilities
+  - sortIndex
+  - timestamp
+- name: DeviceCapability
+  proto: V3DeviceCapability
+  fields:
+  - mode
+  - write
+- name: WriteCapability
+  proto: V3WriteCapability
+  fields:
+  - actions
+- name: DeviceOutput
+  proto: V3DeviceOutput
+  fields:
+  - name
+  - type
+  - precision
+  - scalingFactor
+  - unit
+- name: OutputUnit
+  proto: V3OutputUnit
+  fields:
+  - name
+  - symbol
+- name: Tag
+  proto: V3Tag
+  description: 'The primary addressing primitive: namespace/annotation:label.'
+  fields:
+  - namespace
+  - annotation
+  - label
+- name: Reading
+  proto: V3Reading
+  description: A single value read from a device at a point in time.
+  fields:
+  - id
+  - timestamp
+  - type
+  - deviceType
+  - unit
+  - value
+  - context
+- name: Transaction
+  proto: V3TransactionStatus
+  id_field: id
+  description: The record of an asynchronous write, expiring after the configured cache TTL.
+  fields:
+  - id
+  - created
+  - updated
+  - timeout
+  - status
+  - context
+  - message
+- name: WritePayload
+  proto: V3WritePayload
+  fields:
+  - transaction
+  - action
+  - data
+- name: Version
+  proto: V3Version
+  fields:
+  - pluginVersion
+  - sdkVersion
+  - buildDate
+  - gitCommit
+  - gitTag
+  - arch
+  - os
+relationships:
+- from: Plugin
+  to: Device
+  type: has_many
+  via: Device.plugin
+- from: Plugin
+  to: PluginHealth
+  type: has_one
+  via: plugin id
+- from: PluginHealth
+  to: HealthCheck
+  type: has_many
+  via: V3Health.checks
+- from: Device
+  to: Tag
+  type: has_many
+  via: V3Device.tags
+- from: Device
+  to: DeviceOutput
+  type: has_many
+  via: V3Device.outputs
+- from: Device
+  to: DeviceCapability
+  type: has_one
+  via: V3Device.capabilities
+- from: DeviceCapability
+  to: WriteCapability
+  type: has_one
+  via: V3DeviceCapability.write
+- from: DeviceOutput
+  to: OutputUnit
+  type: has_one
+  via: V3DeviceOutput.unit
+- from: Device
+  to: Reading
+  type: has_many
+  via: V3Reading.id references the device id
+- from: Device
+  to: Transaction
+  type: has_many
+  via: write issued against the device
+- from: Transaction
+  to: WritePayload
+  type: belongs_to
+  via: V3WritePayload.transaction
+enums:
+- name: HealthStatus
+  values:
+  - UNKNOWN
+  - OK
+  - FAILING
+- name: WriteStatus
+  note: Statuses of a write as it is processed asynchronously; see synse.proto.

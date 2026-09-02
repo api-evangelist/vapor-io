@@ -1,0 +1,101 @@
+generated: '2026-09-02'
+method: derived
+source: grpc/vapor-io-synse-v3plugin.proto + https://synse.readthedocs.io/en/latest/server/api.v3/ + vapor-ware repository metadata
+provider: Vapor IO
+note: Assertions below are read from the published contract (synse.proto), the v3 API reference and the
+  Synse component repositories. Nothing is asserted from a marketing claim.
+standards:
+- id: protobuf3
+  conforms: true
+  evidence: grpc/vapor-io-synse-v3plugin.proto declares syntax = "proto3"; service V3Plugin with 12 RPCs.
+- id: grpc
+  conforms: true
+  evidence: synse.proto defines a gRPC service; six of its twelve RPCs return server streams.
+- id: semver
+  conforms: true
+  evidence: https://synse.readthedocs.io/en/latest/releases/ — 'Synse components use semantic versioning
+    for their releases.'
+- id: rfc3339
+  conforms: true
+  evidence: Error and reading payloads carry an RFC3339 timestamp field; documented at https://synse.readthedocs.io/en/latest/server/api.v3/#errors
+- id: rfc9457
+  conforms: false
+  evidence: Synse Server returns a custom JSON envelope (http_code/description/timestamp/context), not
+    application/problem+json. Documented at https://synse.readthedocs.io/en/latest/server/api.v3/#errors
+- id: oauth2
+  conforms: false
+  evidence: 'No OAuth. The platform overview lists ''Access control to plugins/devices'' under what Synse
+    does not provide: https://synse.readthedocs.io/en/latest/'
+- id: oidc
+  conforms: false
+  evidence: No OpenID Connect; /.well-known/openid-configuration is 404 on every host.
+- id: pagination
+  conforms: false
+  evidence: No collection endpoint documents page/limit/cursor parameters at https://synse.readthedocs.io/en/latest/server/api.v3/
+- id: idempotency
+  conforms: false
+  partial: true
+  evidence: Writes accept an optional client-supplied `transaction` ID and reject a conflicting one with
+    an error, which de-duplicates but does not replay the original result. Documented at https://synse.readthedocs.io/en/latest/server/api.v3/#write-asynchronous
+- id: openapi
+  conforms: false
+  evidence: No OpenAPI is published. Searched vapor-ware for filename:openapi and filename:swagger (one
+    hit, aionetbox/tests/data/openapi-2.yaml, which is a NetBox test fixture and not a Vapor IO contract),
+    probed /openapi.json, /openapi.yaml, /swagger.json and /api-docs on www.vapor.io and synse.readthedocs.io
+    — all miss.
+- id: asyncapi
+  conforms: false
+  evidence: A documented WebSocket event catalog exists but no AsyncAPI document is published; org-wide
+    code search for 'asyncapi' returns 0 results.
+domain_standards:
+- id: ipmi
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/synse-ipmi-plugin — 'IPMI plugin for Synse'; image vaporio/ipmi-plugin
+    2.0.0.
+  note: IPMI is the baseboard-management standard for the data center market Synse serves.
+- id: snmp
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/synse-snmp-plugin and synse-snmp-base — SNMP plugins; image
+    vaporio/snmp-plugin 2.2.5.
+- id: rfc1628-ups-mib
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/synse-snmp-ups-plugin — 'Synse SNMP plugin for the RFC1628 UPS
+    MIB'; Helm chart synse/snmp-ups 0.2.1 described as 'SNMP plugin the RFC1628 UPS MIB'.
+- id: modbus-tcp
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/synse-modbus-ip-plugin — 'Modbus over TCP/IP plugin for Synse';
+    image vaporio/modbus-ip-plugin 2.1.7.
+- id: intel-amt
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/synse-amt-plugin — 'Intel AMT plugin for Synse'; image vaporio/amt-plugin
+    2.0.0.
+- id: openconfig
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/octool — 'Basic command line tool to help diagnose OpenConfig
+    gRPC connections'; Helm chart synse/openconfig 0.2.3 'Synse plugin to collect networking telemetry
+    with OpenConfig'.
+- id: netconf
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/go-netconf — 'NETCONF implementation in Go'.
+- id: juniper-jti
+  conforms: true
+  layer: implementation
+  evidence: https://github.com/vapor-ware/synse-juniper-jti-plugin — Juniper JTI telemetry over UDP; vendors
+    Juniper's own .proto files, which are NOT Vapor IO contracts.
+domain_standard_note: 'Every domain-standard row above is layer: implementation — Synse plugins speak
+  these protocols southbound to hardware. The northbound contract (synse.proto and the v3 HTTP API) is
+  deliberately protocol-agnostic and declares no domain standard of its own; the whole product thesis
+  is that a caller reads a temperature sensor over RS-485 the same way it reads a BMC over IPMI. Recorded
+  as implementation rather than contract-level so this is not read as a contract-side declaration.'
+compliance_programs:
+  published: false
+  note: No SOC 2, ISO 27001, PCI, HIPAA or FedRAMP attestation is published on www.vapor.io or in the
+    Synse documentation, and probe-security-programs.py found no trust center. No Compliance pointer is
+    emitted.

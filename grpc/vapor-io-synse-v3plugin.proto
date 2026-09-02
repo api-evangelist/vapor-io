@@ -1,0 +1,386 @@
+syntax = "proto3";
+
+package synse;
+
+
+// V3Plugin is the API for plugin communication in Synse v3.
+service V3Plugin {
+
+    // Devices gets all devices that a plugin manages.
+    rpc Devices(V3DeviceSelector) returns (stream V3Device) {}
+
+    // Health gets the health status of a plugin.
+    rpc Health(Empty) returns (V3Health) {}
+
+    // Metadata gets the plugin meta-information.
+    rpc Metadata(Empty) returns (V3Metadata) {}
+
+    // Read gets readings from the specified plugin device(s).
+    rpc Read(V3ReadRequest) returns (stream V3Reading) {}
+
+    // ReadCache gets the cached readings from the plugin. If the plugin
+    // is not configured to cache readings, it will returned the entire
+    // current read state.
+    rpc ReadCache(V3Bounds) returns (stream V3Reading) {}
+
+    // ReadStream returns reading data for the specified devices as they
+    // are read by the plugin.
+    rpc ReadStream(V3StreamRequest) returns (stream V3Reading) {}
+
+    // Test checks whether the plugin is reachable and ready.
+    rpc Test(Empty) returns (V3TestStatus) {}
+
+    // Transaction gets the status of a write transaction for an
+    // asynchronous write.
+    rpc Transaction(V3TransactionSelector) returns (V3TransactionStatus) {}
+
+    // Transactions gets all transactions which are currently kept
+    // in the plugin's transaction cache.
+    rpc Transactions(Empty) returns (stream V3TransactionStatus) {}
+
+    // Version gets the version information for the plugin.
+    rpc Version(Empty) returns (V3Version) {}
+
+    // WriteAsync writes data to the specified plugin device. A transaction ID
+    // is returned so the write status can be checked asynchronously.
+    rpc WriteAsync(V3WritePayload) returns (stream V3WriteTransaction) {}
+
+    // WriteSync writes data to the specified plugin device. The request blocks
+    // until the write resolves so no asynchronous checking is required.
+    rpc WriteSync(V3WritePayload) returns (stream V3TransactionStatus) {}
+}
+
+// HealthStatus is the status of a health check.
+enum HealthStatus {
+    UNKNOWN = 0;
+    OK = 1;
+    FAILING = 2;
+}
+
+// WriteStatus are the statuses of a write as it is processed asynchronously.
+enum WriteStatus {
+    PENDING = 0;
+    WRITING = 1;
+    DONE = 3;
+    ERROR = 4;
+}
+
+// Empty is an empty message (no fields) which is used for RPC routes which
+// do not require any input for the request.
+message Empty {}
+
+// V3Bounds specifies time bounds in RFC3339 format.
+message V3Bounds {
+    // RFC3339 formatted timestamp specifying the beginning of the time bound. If
+    // left unspecified, the start is considered unbound.
+    string start = 1;
+
+    // RFC3339 formatted timestamp specifying the ending of the time bound. If
+    // left unspecified, the end is considered unbound.
+    string end = 2;
+}
+
+// V3Device contains all of the pertinent known data associated with a device.
+message V3Device {
+    // RFC3339 timestamp for when the device info was gathered.
+    string timestamp = 1;
+
+    // The globally unique ID for the device.
+    string id = 2;
+
+    // The type of device.
+    string type = 3;
+
+    // The id of the plugin that the device is managed by.
+    string plugin = 4;
+
+    // Additional information for the device.
+    string info = 5;
+
+    // A human-readable alias for the device.
+    string alias = 6;
+
+    // Any arbitrary metadata associated with the device.
+    map<string,string> metadata = 7;
+
+    // The read/write capabilities of the device.
+    V3DeviceCapability capabilities = 8;
+
+    // The tags that are associated with the device.
+    repeated V3Tag tags = 9;
+
+    // The reading outputs that the device can generate on read.
+    repeated V3DeviceOutput outputs = 10;
+
+    // A 1-based sort ordinal for the device. This will help determine where
+    // the device shows up in the scan.
+    int32 sortIndex = 11;
+}
+
+// V3DeviceCapability specifies the capabilities that a device exposes via Synse.
+message V3DeviceCapability {
+    // The capability mode of the device ("r": read only, "w": write only, "rw": read/write)
+    string mode = 1;
+
+    // The write capabilities of the device.
+    V3WriteCapability write = 2;
+}
+
+// V3DeviceOutput specifies the output types for a device's reading(s).
+message V3DeviceOutput {
+    // The name of the device output.
+    string name = 1;
+
+    // The type of the output.
+    string type = 2;
+
+    // The decimal precision of the output. A precision of 0 (default) means no
+    // precision is applied.
+    int32 precision = 3;
+
+    // The factor to multiply the reading result returned from the device. This can be
+    // positive, negative, whole, or decimal.
+    double scalingFactor = 4;
+
+    // The unit of measure for the reading output.
+    V3OutputUnit unit = 5;
+}
+
+// V3DeviceSelector specifies a selector to identify devices for various actions.
+message V3DeviceSelector {
+    // The tags to use as selectors.
+    repeated V3Tag tags = 1;
+
+    // The ID of the device. If this is set, tags will be ignored.
+    string id = 2;
+}
+
+// V3Health is the health status for a plugin.
+message V3Health {
+    // RFC3339 formatted timestamp of the time when the health was checked.
+    string timestamp = 1;
+
+    // The overall health status of a plugin.
+    HealthStatus status = 2;
+
+    // All of the health checks for a plugin.
+    repeated V3HealthCheck checks = 3;
+}
+
+// V3HealthCheck is the health check status for a plugin.
+message V3HealthCheck {
+    // The name of the health check.
+    string name = 1;
+
+    // The status of the health check.
+    HealthStatus status = 2;
+
+    // Any additional information associated with the health check.
+    string message = 3;
+
+    // RFC3339 formatted timestamp at which the check was last completed.
+    string timestamp = 4;
+
+    // The type of health check. The different kinds of health check are
+    // defined in the SDK.
+    string type = 5;
+}
+
+// V3Metadata is static metadata about a plugin.
+message V3Metadata {
+    // The name of the plugin.
+    string name = 1;
+
+    // The maintainer of the plugin.
+    string maintainer = 2;
+
+    // The normalized tag name for plugin meta-info.
+    string tag = 3;
+
+    // A brief description of the plugin.
+    string description = 4;
+
+    // A link to the plugin's VCS repo.
+    string vcs = 5;
+
+    // The generated plugin namespace ID.
+    string id = 6;
+}
+
+// V3OutputUnit the unit of measure for a reading.
+message V3OutputUnit {
+    // The full name of the unit.
+    string name = 1;
+
+    // The symbolic representation of the unit.
+    string symbol = 2;
+}
+
+// V3Reading is a reading response from a device.
+message V3Reading {
+    // The GUID of the device being read from.
+    string id = 1;
+
+    // RFC3339 formatted timestamp for when the reading was taken.
+    string timestamp = 2;
+
+    // The type of the reading.
+    string type = 3;
+
+    // The type of the device the reading originated from.
+    string deviceType = 4;
+
+    // Any additional information associated with a reading.
+    map<string,string> context = 5;
+
+    // The unit of measure for the reading.
+    V3OutputUnit unit = 6;
+
+    // The value of the reading.
+    oneof value {
+        string string_value  = 7;
+        bool   bool_value    = 8;
+        float  float32_value = 9;
+        double float64_value = 10;
+        int32  int32_value   = 11;
+        int64  int64_value   = 12;
+        bytes  bytes_value   = 13;
+        uint32 uint32_value  = 14;
+        uint64 uint64_value  = 15;
+    }
+
+    // Info string associated with the Reading's device. This provides
+    // additional human-readable context for the reading.
+    string deviceInfo = 16;
+}
+
+// V3ReadRequest is a request for device readings.
+message V3ReadRequest {
+    // The selector for the device(s) to read from.
+    V3DeviceSelector selector = 1;
+}
+
+// V3StreamRequest is a request to stream device readings. It allows the
+// requester to specify multiple device selectors to allow for additive
+// device selection.
+message V3StreamRequest {
+    repeated V3DeviceSelector selectors = 1;
+}
+
+// V3Tag is a specification for a single tag.
+message V3Tag {
+    // The namespace of the tag.
+    string namespace = 1;
+
+    // The annotation of the tag.
+    string annotation = 2;
+
+    // The tag label.
+    string label = 3;
+}
+
+// V3TestStatus is the status response for plugin availability.
+message V3TestStatus {
+    // A flag describing whether the plugin is ready and reachable.
+    bool ok = 1;
+}
+
+// V3TransactionSelector specifies a selector to identify a transaction.
+message V3TransactionSelector {
+    // The ID of a write transaction.
+    string id = 1;
+}
+
+
+// V3TransactionStatus the status of a write transaction.
+message V3TransactionStatus {
+    // The ID of the write transaction.
+    string id = 1;
+
+    // RFC3339 formatted timestamp of when the transaction was created.
+    string created = 2;
+
+    // RFC3339 formatted timestamp of when the transaction was last updated.
+    string updated = 3;
+
+    // Context information for any errors that may have occurred.
+    string message = 4;
+
+    // The timeout within which the transaction remains valid.
+    string timeout = 5;
+
+    // The status of the write (pending, writing, done, error).
+    WriteStatus status = 6;
+
+    // The data that was written for the write transaction.
+    V3WriteData context = 7;
+}
+
+// V3Version provides version information for the plugin.
+message V3Version {
+    // The semantic version of the plugin.
+    string pluginVersion = 1;
+
+    // The version of the SDK the plugin uses.
+    string sdkVersion = 2;
+
+    // The timestamp from when the plugin was built.
+    string buildDate = 3;
+
+    // The commit hash at which the plugin was built.
+    string gitCommit = 4;
+
+    // The tag name at which the plugin was built.
+    string gitTag = 5;
+
+    // The architecture that the plugin was built.
+    string arch = 6;
+
+    // The operating system that the plugin was built for.
+    string os = 7;
+}
+
+// V3WriteCapability specifies the write capabilities for a device.
+message V3WriteCapability {
+    // The write actions supported by a device.
+    repeated string actions = 1;
+}
+
+// V3WriteData is the data to write to a device.
+message V3WriteData {
+    // The action string for the write.
+    string action = 1;
+
+    // Additional data for the write action.
+    bytes data = 2;
+
+    // A custom transaction that can be associated with the write.
+    string transaction = 3;
+}
+
+// V3WritePayload the payload for a write which specifies the device to
+// write to and the data to write.
+message V3WritePayload {
+    // The selector for the device to write to. This should resolve
+    // to a single device.
+    V3DeviceSelector selector = 1;
+
+    // The data to write to the device.
+    repeated V3WriteData data = 2;
+}
+
+// V3WriteTransaction contains information associating a write action with
+// a transaction for asynchronous tracking.
+message V3WriteTransaction {
+    // The ID of the write transaction.
+    string id = 1;
+
+    // The GUID of the device written to.
+    string device = 2;
+
+    // The data that was written for the write transaction.
+    V3WriteData context = 3;
+
+    // The timeout within which the transaction remains valid.
+    string timeout = 4;
+}

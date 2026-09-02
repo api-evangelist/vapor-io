@@ -1,0 +1,59 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/cli/intro/ and /cli/usage/
+provider: Vapor IO
+name: Synse CLI
+binary: synse
+language: Go
+repository: https://github.com/vapor-ware/synse-cli
+docs: https://synse.readthedocs.io/en/latest/cli/intro/
+usage_docs: https://synse.readthedocs.io/en/latest/cli/usage/
+version: v3.0.1
+released: '2023-09-19'
+description: A command line tool that interfaces with Synse Server and with Synse plugins directly, for
+  real-time device queries, development and debugging.
+install:
+- method: homebrew
+  commands:
+  - brew tap vapor-ware/formula
+  - brew install vapor-ware/formula/synse
+  note: Installs as `synse` on the PATH.
+- method: binary
+  url: https://github.com/vapor-ware/synse-cli/releases
+  note: Precompiled binaries published as GitHub release artifacts, named synse-cli_{version}_{os}_{arch}.tar.gz.
+- method: source
+  commands:
+  - make build
+  note: Builds the `synse` binary in the project root.
+- method: docker
+  url: https://hub.docker.com/r/vaporio/synse-cli
+  note: A vaporio/synse-cli image exists but its newest tag is 0.1.0 from 2017-06-15 — far behind the
+    v3 CLI.
+command_groups:
+- name: server
+  description: Interact with a Synse Server instance. Sub-commands correspond to the actions available
+    via the Synse Server v3 API.
+  backs: Synse Server API (v3)
+- name: plugin
+  description: Interact with a Synse plugin directly, routed over the internal gRPC API.
+  backs: Synse Plugin gRPC API (V3Plugin)
+- name: context
+  description: Manage persisted connection contexts for server and plugin instances.
+  backs: null
+flows:
+- name: add and activate a server context
+  commands:
+  - synse context add server local-synse localhost:5000
+  - synse context set local-synse
+- name: add a plugin context
+  commands:
+  - synse context add plugin local-plugin localhost:5001
+- name: list contexts
+  commands:
+  - synse context list
+  note: A `*` under CURRENT marks the active context. One server context and one plugin context may be
+    active at a time.
+config_file: ~/.synse.yml
+note: The docs show `Available Commands:` elided as `# ...`, so the full sub-command list is not published
+  in the reference; it is discoverable at runtime via `synse [command] --help`. Groups and flows above
+  are recorded exactly as documented, with nothing invented.

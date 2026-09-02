@@ -1,0 +1,100 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/server/api.v3/ and https://synse.readthedocs.io/en/latest/server/user/configuration/
+provider: Vapor IO
+api: Synse Server API (v3)
+docs: https://synse.readthedocs.io/en/latest/server/api.v3/
+auth_style:
+  style: none
+  detail: No application-level auth. See authentication/vapor-io-authentication.yml.
+transports:
+  http:
+    base: http://{synse-server-host}:5000
+    note: Self-hosted; port 5000 by default.
+  websocket:
+    endpoint: ws://{synse-server-host}:5000/v3/connect
+    message_shape:
+      id: int
+      event: string
+      data: object
+    note: Both transports expose the same information. Client request events are prefixed `request/`,
+      server responses `response/`. The client tracks and increments its own message ids; the server reflects
+      the id so responses can be matched to requests. Streamed readings are WebSocket-only.
+versioning:
+  style: uri-path
+  current: v3
+  detail: Resource operations are prefixed /v3/. Two operations sit outside the versioned prefix — GET
+    /test and GET /version — deliberately, so a caller can discover the API version before committing
+    to a path. GET /version returns api_version, which the docs say to use in subsequent requests.
+pagination:
+  supported: false
+  detail: No page, limit, offset or cursor parameter is documented on any collection endpoint. Collections
+    (scan, tags, transactions, readings) return full arrays. Reading volume is narrowed with tag filters
+    and, for the read cache, with `start`/`end` bounds rather than with pages.
+filtering:
+  style: tags
+  detail: 'Devices are selected by tag rather than by id wherever a set is meant: GET /v3/scan and GET
+    /v3/read take tag filters, GET /v3/tags lists the tag namespace, and passing the `id` tag to read
+    is functionally equivalent to GET /v3/read/{device}. Tags are the primary addressing convention of
+    the API.'
+field_expansion:
+  supported: false
+metadata:
+  supported: true
+  detail: Devices carry plugin-defined metadata and capabilities, retrievable via GET /v3/info/{device}.
+request_tracing:
+  header: null
+  detail: No request-id header is documented for the HTTP API. Over WebSocket, the client-assigned numeric
+    `id` is reflected on every response and is the correlation mechanism. Write operations return a transaction
+    id that correlates the asynchronous work.
+error_envelope:
+  format: custom-json
+  fields:
+  - http_code
+  - description
+  - timestamp
+  - context
+  see: errors/vapor-io-problem-types.yml
+rate_limit_signaling:
+  headers: []
+  detail: No rate-limit headers and no 429 are documented. See rate-limits/vapor-io-rate-limits.yml.
+idempotency:
+  supported: false
+  partial: true
+  header: null
+  mechanism: client-supplied transaction id in the POST body
+  scope: per write operation
+  retention: Transaction ids are not stored indefinitely; they expire after a configurable cache TTL (see
+    the server configuration `cache` section), after which GET /v3/transaction/{transaction} returns 404.
+  detail: 'Synse writes accept an optional `transaction` field in the POST body: ''A user-defined transaction
+    ID for the write. If this conflicts with an existing transaction ID, an error is returned.'' That
+    de-duplicates a repeated write while the id is still cached, but it is NOT idempotency-key semantics
+    — the retry is rejected rather than replayed, so the caller does not get the original result back,
+    and once the TTL expires the same id will execute a second physical write. No Idempotency-Key header,
+    no replay guarantee, no documented safe-retry contract. Because of that gap, no `Idempotency` pointer
+    is wired in apis.yml.'
+  docs: https://synse.readthedocs.io/en/latest/server/api.v3/#write-asynchronous
+reversibility:
+  grade: none
+  applicable: true
+  detail: 'Synse has a real write surface — POST /v3/write/{device} and POST /v3/write/wait/{device} act
+    on physical and virtual hardware — and NO reversal operation of any kind is documented. There is no
+    cancel, no undo, no rollback, no restore, and no window. A queued transaction cannot be cancelled:
+    GET /v3/transaction/{transaction} reports status only. The only way back from a write is a compensating
+    write of the opposite action, which the API neither models nor guarantees is available — whether a
+    device can be returned to its prior state depends entirely on the plugin and the hardware, and the
+    API exposes no prior-state read that would tell an agent what to restore.'
+  reversal_operations: []
+  windows: []
+  agent_guidance: Treat every Synse write as irreversible. Read GET /v3/info/{device} for the device's
+    capabilities and GET /v3/read/{device} for its current value BEFORE writing, because that read is
+    the only record of the state you are about to overwrite.
+dry_run_mode:
+  supported: false
+  detail: No dry-run, preview, validate-only or simulate parameter is documented on either write operation.
+cross_links:
+  errors: errors/vapor-io-problem-types.yml
+  lifecycle: lifecycle/vapor-io-lifecycle.yml
+  authentication: authentication/vapor-io-authentication.yml
+  rate_limits: rate-limits/vapor-io-rate-limits.yml
+  data_model: data-model/vapor-io-data-model.yml

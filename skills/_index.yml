@@ -1,0 +1,64 @@
+generated: '2026-09-02'
+method: generated
+source: https://synse.readthedocs.io/en/latest/server/api.v3/
+provider: Vapor IO
+api: Synse Server API (v3)
+note: >-
+  Four packaged Agent Skills for the Synse Server v3 API. Vapor IO publishes no OpenAPI, so
+  operations are grounded in the HTTP method + path and the WebSocket event names exactly as
+  they appear in the published v3 API reference and in the Protocol Buffers contract — every
+  path and event below was read out of the provider's own docs, none was inferred. Because
+  there is no OpenAPI there are no operationIds to bind to; the method + path IS the
+  identifier this API publishes. No provider-published skills or AGENTS.md exist in the
+  vapor-ware organization.
+skills:
+  - name: read-device-telemetry
+    file: read-device-telemetry.md
+    description: >-
+      Discover the devices a deployment manages and read their current values, using tags
+      rather than pagination to narrow the set.
+    operations:
+      - GET /test
+      - GET /version
+      - GET /v3/scan
+      - GET /v3/tags
+      - GET /v3/info/{device}
+      - GET /v3/read
+      - GET /v3/read/{device}
+      - GET /v3/readcache
+  - name: write-to-device-and-track-transaction
+    file: write-to-device-and-track-transaction.md
+    description: >-
+      Issue a write to physical or virtual hardware and follow the transaction. Carries the
+      irreversibility warning: Synse documents no cancel, undo, rollback or restore.
+    destructive: true
+    operations:
+      - GET /v3/info/{device}
+      - GET /v3/read/{device}
+      - POST /v3/write/{device}
+      - POST /v3/write/wait/{device}
+      - GET /v3/transaction/{transaction}
+      - GET /v3/transaction
+  - name: check-synse-deployment-health
+    file: check-synse-deployment-health.md
+    description: >-
+      Establish reachability, registered plugins and plugin health before trusting any
+      reading — an empty scan is ambiguous until these have been run.
+    operations:
+      - GET /test
+      - GET /version
+      - GET /v3/config
+      - GET /v3/plugin
+      - GET /v3/plugin/{plugin}
+      - GET /v3/plugin/health
+      - GET /v3/scan
+  - name: stream-readings-over-websocket
+    file: stream-readings-over-websocket.md
+    description: >-
+      Open the WebSocket API and subscribe to readings as plugins produce them. The only
+      pushing surface Synse has, and the only place streamed readings exist.
+    operations:
+      - WS /v3/connect
+      - request/read_stream
+      - response/reading
+      - response/error

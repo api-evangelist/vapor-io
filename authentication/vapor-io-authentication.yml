@@ -1,0 +1,42 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/server/user/advanced/#secure-communication and /server/user/configuration/
+provider: Vapor IO
+api: Synse Server API (v3)
+summary: 'Synse Server publishes NO application-level authentication or authorization. The platform overview
+  states this outright under ''What Synse Does Not Provide'': ''Access control to plugins/devices.'' Every
+  documented HTTP and WebSocket operation, including the two write operations that act on physical hardware,
+  is unauthenticated. Security is transport-level and is the operator''s responsibility.'
+security_schemes: []
+auth_required: false
+transport_security:
+- name: server TLS
+  description: The HTTP/WebSocket API can be served over TLS by supplying a certificate and key.
+  config:
+    yaml_keys:
+    - ssl.cert
+    - ssl.key
+    env:
+    - SYNSE_SSL_CERT
+    - SYNSE_SSL_KEY
+  docs: https://synse.readthedocs.io/en/latest/server/user/configuration/#ssl
+  note: 'The docs recommend a TLS-terminating frontend such as Nginx for production rather than the built-in
+    option: ''While this may work for small/personal use cases, it is recommended to use a more robust
+    TLS termination frontend for it in production.'''
+- name: plugin gRPC TLS
+  description: The internal Synse Server to plugin gRPC channel can be secured with TLS.
+  config:
+    yaml_keys:
+    - grpc.tls.cert
+    env:
+    - SYNSE_GRPC_TLS_CERT
+  docs: https://synse.readthedocs.io/en/latest/server/user/configuration/#tls
+  note: Synse performs no certificate generation or management; the operator supplies and rotates certs.
+oauth2: false
+oidc: false
+api_keys: false
+mtls: false
+agent_guidance: An agent calling a Synse deployment needs no credential and will not be told it lacks
+  authority. The only thing standing between a caller and a write to physical hardware is network reach,
+  so treat network placement, not an auth header, as the access control boundary.
+docs: https://synse.readthedocs.io/en/latest/server/user/advanced/#secure-communication

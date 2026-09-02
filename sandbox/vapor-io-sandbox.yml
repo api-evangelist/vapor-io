@@ -1,0 +1,38 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/server/user/quickstart/
+provider: Vapor IO
+kind: local emulator
+hosted_console: false
+note: Synse ships a first-party emulator plugin so the full API can be exercised with no physical hardware
+  and no credentials. There is no hosted sandbox, no test/live key modes and no test fixtures of the payments
+  kind — Synse has no authentication at all, so there is nothing to key. The Kinetic Grid Portal has no
+  public trial or sandbox.
+docs: https://synse.readthedocs.io/en/latest/server/user/quickstart/
+emulator:
+  image: vaporio/emulator-plugin
+  repository: https://github.com/vapor-ware/synse-emulator-plugin
+  version: 3.4.1
+  published: '2023-02-27'
+  description: A Synse plugin providing emulated devices and readings.
+quickstart:
+  steps:
+  - docker run --name synse-server -p 5000:5000 -d vaporio/synse-server
+  - curl localhost:5000/test
+  - curl localhost:5000/version
+  - docker rm -f synse-server
+  - docker run --name synse-server -p 5000:5000 -d -e SYNSE_PLUGIN_TCP="emulator:5001" vaporio/synse-server
+  - docker network create synse-net
+  - docker network connect synse-net synse-server
+  - docker run -d --expose 5001 --network synse-net --network-alias emulator vaporio/emulator-plugin
+  - curl 'localhost:5000/v3/scan?force=true'
+  note: Verbatim from the quickstart. The server runs out of the box with no configuration, but returns
+    no device data until a plugin is registered.
+compose_example: https://github.com/vapor-ware/synse-server/blob/develop/examples/deploying/docker-compose/docker-compose.yaml
+kubernetes_example: https://github.com/vapor-ware/synse-server/blob/develop/examples/deploying/kubernetes/synse-server.yaml
+load_generator:
+  repository: https://github.com/vapor-ware/synse-loadgen
+  description: Generates request loads against the Synse Server API for development and testing.
+test_credentials: null
+test_values: null
+time_simulation: false

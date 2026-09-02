@@ -1,0 +1,53 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/releases/ + GitHub releases + DNS probe of status.vapor.io
+provider: Vapor IO
+versioning:
+  scheme: semver
+  policy_url: https://synse.readthedocs.io/en/latest/releases/
+  api_version_in_path: true
+  current_api_version: v3
+  note: 'Synse components use semantic versioning. Major releases carry breaking changes and are reserved
+    for them: ''A new major release should only be done if there are breaking API changes; it should not
+    occur for standard bug fixes, feature additions, dependency updates.'' Minor releases are backward
+    compatible within a major line. The API version is in the URI path (/v3/...) and is also returned
+    by GET /version as api_version, which the docs say should be used for subsequent requests.'
+  compatibility_matrix: Starting with Synse v3, each component's README carries a compatibility matrix
+    stating which versions work with which versions of the platform.
+deprecation_policy:
+  published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: No deprecation policy, no Sunset or Deprecation response headers, and no deprecation window are
+    documented. The releases page carries a single end-of-support statement — 'With the v3 release of
+    Synse, previous versions of Synse will no longer be supported' — which announces the outcome but states
+    no notice period and no migration window. No Deprecation pointer is emitted in apis.yml on the strength
+    of that sentence.
+status_page:
+  published: false
+  note: No status page for either the Synse platform or the Kinetic Grid. status.vapor.io does not resolve
+    (NXDOMAIN on 2026-09-02). Synse is self-hosted software, so uptime is the operator's; the Kinetic
+    Grid is an operated service and has no public status surface.
+sla:
+  published: false
+  note: No public SLA. Service commitments live in the Master Services Agreement and the Service Schedules
+    on https://www.vapor.io/legal/, which are contract documents rather than a published uptime target.
+health_endpoints:
+- path: /test
+  description: Liveness/readiness — returns 200 with status and timestamp when the server is up and ready.
+- path: /v3/plugin/health
+  description: Health summary of registered plugins.
+release_cadence:
+  synse_server_latest:
+    version: v3.4.2
+    date: '2021-10-21'
+  synse_cli_latest:
+    version: v3.0.1
+    date: '2023-09-19'
+  synse_sdk_latest:
+    version: v2.1.2
+    date: '2022-07-22'
+  note: The API server's last tagged release is 2021-10-21 and its last repository push is 2023-07-17.
+    The platform is stable and published but not actively released.
+deprecated_operations: []

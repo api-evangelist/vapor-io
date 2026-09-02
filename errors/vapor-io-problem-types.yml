@@ -1,0 +1,57 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/server/api.v3/#errors
+provider: Vapor IO
+api: Synse Server API (v3)
+format: custom-json
+rfc9457: false
+content_type: application/json
+note: Synse Server returns a custom JSON error envelope, not RFC 7807 / RFC 9457 application/problem+json.
+  The same envelope is delivered over the WebSocket API inside a `response/error` message, with id -1
+  when the failure happened before the request could be parsed. The docs also state that some failures
+  return no JSON body at all — the class of error where the application is not ready, not available, or
+  not reachable. Note the contrast with vapor-ware/fastapi-rfc7807, a first-party library that does implement
+  problem details for other services.
+envelope:
+  fields:
+  - name: http_code
+    type: integer
+    description: The HTTP code corresponding to the error.
+  - name: description
+    type: string
+    description: A short description of the error.
+  - name: timestamp
+    type: string
+    description: RFC3339 timestamp at which the error occurred.
+  - name: context
+    type: string
+    description: Contextual message for the error's root cause, typically including pertinent internal
+      state.
+  example:
+    http_code: 404
+    description: resource not found
+    timestamp: '2019-01-01T12:00:00Z'
+    context: 'transaction not found: f041883c-cf87-55d7-a978-3d3103836412'
+problem_types:
+- status: 400
+  title: Invalid user input
+  detail: Invalid POSTed JSON, unsupported query parameters, or invalid resource types.
+  remediation: Validate the request body against the POST Body schema and drop query parameters the endpoint
+    does not document.
+- status: 404
+  title: Resource not found
+  detail: The specified device, plugin or transaction does not exist.
+  remediation: Re-run GET /v3/scan to refresh the device cache, or note that transaction IDs expire after
+    the configured cache TTL.
+- status: 405
+  title: Action not supported for device
+  detail: The device does not support the attempted read or write action.
+  remediation: Check the device's capabilities via GET /v3/info/{device} before issuing the action.
+- status: 500
+  title: Server side processing error
+  detail: Server-side failure while processing the request.
+  remediation: Check the server logs and GET /v3/plugin/health — an inactive plugin is a common cause.
+websocket:
+  error_event: response/error
+  id_on_unparsable_request: -1
+  note: All WebSocket requests may return response/error carrying the same envelope.

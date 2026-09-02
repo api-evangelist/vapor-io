@@ -1,0 +1,125 @@
+# Vapor IO
+
+> Vapor IO builds and operates the Kinetic Grid, a carrier-neutral network of micro modular
+> data centers delivering edge colocation, interconnection, networking and network-delivered
+> AI across dozens of US markets and, via a Cellnex partnership, into Europe. Its public,
+> machine-readable developer surface is the open source Synse platform.
+
+Generated: 2026-09-02
+Method: generated (Vapor IO publishes no llms.txt; https://www.vapor.io/llms.txt and
+https://synse.readthedocs.io/llms.txt both returned 404 on 2026-09-02)
+Source: apis.yml and the artifacts in this repository
+
+## What is actually callable
+
+Two APIs, both from the open source Synse platform, both **self-hosted** — Vapor IO operates
+no public API endpoint. The base URL is the host and port of the operator's own deployment.
+
+- Synse Server API (v3) — a uniform HTTP and WebSocket API for monitoring and controlling
+  physical and virtual devices through protocol plugins. 18 operations, default port 5000.
+  Reference: https://synse.readthedocs.io/en/latest/server/api.v3/
+- Synse Plugin gRPC API (V3Plugin) — the internal server-to-plugin API. 12 RPCs, six of them
+  server-streaming, published as a Protocol Buffers contract. Default port 5001.
+  Contract: https://github.com/vapor-ware/synse-server-grpc/blob/master/synse.proto
+
+The Kinetic Grid Portal is described as API-accessible for telemetry and port-level network
+control, but that API is documented only to customers. Nothing about it is public.
+
+## Synse Server v3 — HTTP operations
+
+    GET  /test                              server liveness/readiness
+    GET  /version                           server version + api_version
+    GET  /v3/config                         unified runtime configuration
+    GET  /v3/plugin                         registered plugin summary
+    GET  /v3/plugin/{plugin}                one plugin's detail
+    GET  /v3/plugin/health                  plugin health summary
+    GET  /v3/scan                           list devices (tag-filterable; ?force=true rebuilds cache)
+    GET  /v3/device                         alias for /v3/scan
+    GET  /v3/tags                           list device tags
+    GET  /v3/info/{device}                  device metadata, outputs, capabilities
+    GET  /v3/read                           read devices matching tags
+    GET  /v3/read/{device}                  read one device
+    GET  /v3/readcache                      cached readings, bounded by start/end
+    POST /v3/write/{device}                 asynchronous write -> transaction id
+    POST /v3/write/wait/{device}            synchronous write, blocks until resolved
+    GET  /v3/transaction                    all tracked transaction ids
+    GET  /v3/transaction/{transaction}      one transaction's status
+    GET  /v3/device/{device}                read a device
+    POST /v3/device/{device}                write to a device
+
+WebSocket: ws://{host}:5000/v3/connect — 17 request events mirroring the above, plus
+`request/read_stream`, which has no HTTP equivalent. Envelope: {id, event, data}.
+
+## Things an agent must know before calling
+
+- **No authentication.** None. The docs state plainly that Synse does not provide "access
+  control to plugins/devices". Every operation, including both writes to physical hardware,
+  is unauthenticated. Network placement is the access boundary. TLS is available but is the
+  operator's to configure.
+- **Writes are irreversible.** No cancel, undo, rollback or restore operation is documented,
+  and a queued transaction cannot be cancelled. Read `GET /v3/read/{device}` first — it is
+  the only record of the state you are about to overwrite.
+- **The `transaction` field is not an idempotency key.** A conflicting id is rejected, not
+  replayed, and after the cache TTL the same id fires a second physical write.
+- **No pagination.** Narrow with tags before you call; collections return in full.
+- **Errors are not RFC 9457.** The envelope is {http_code, description, timestamp, context}.
+  Documented codes: 400, 404, 405, 500. Some failures return no JSON body at all.
+- **No rate limits.** None documented, no 429, no Retry-After — you are load on someone's
+  own hardware.
+- **Transaction ids expire.** A 404 from /v3/transaction/{id} means expired or never existed.
+
+## Documentation
+
+- Platform docs: https://synse.readthedocs.io/en/latest/
+- Server intro: https://synse.readthedocs.io/en/latest/server/intro/
+- v3 API reference: https://synse.readthedocs.io/en/latest/server/api.v3/
+- Quickstart: https://synse.readthedocs.io/en/latest/server/user/quickstart/
+- Configuration: https://synse.readthedocs.io/en/latest/server/user/configuration/
+- Advanced / secure communication: https://synse.readthedocs.io/en/latest/server/user/advanced/
+- Plugin SDK: https://synse.readthedocs.io/en/latest/sdk/intro/
+- CLI: https://synse.readthedocs.io/en/latest/cli/intro/
+- Releases and versioning policy: https://synse.readthedocs.io/en/latest/releases/
+- License (GPL-3.0): https://synse.readthedocs.io/en/latest/license/
+
+## Code and distribution
+
+- GitHub organization: https://github.com/vapor-ware
+- Server: https://github.com/vapor-ware/synse-server
+- gRPC contract: https://github.com/vapor-ware/synse-server-grpc
+- Go client v1.1.0 (2022-08-18): https://github.com/vapor-ware/synse-client-go
+- Python client `synse` 1.0.1 (2021-01-21): https://pypi.org/project/synse/
+- Python gRPC bindings `synse-grpc` 3.1.0 (2021-01-19): https://pypi.org/project/synse-grpc/
+- Plugin SDK (Go) v2.1.2 (2022-07-22): https://github.com/vapor-ware/synse-sdk
+- CLI v3.0.1 (2023-09-19): https://github.com/vapor-ware/synse-cli — `brew install vapor-ware/formula/synse`
+- Container images: https://hub.docker.com/u/vaporio — vaporio/synse-server (v3.4.2, 2021-10-21)
+- Emulator for local testing: https://hub.docker.com/r/vaporio/emulator-plugin
+
+Caveat on currency: the API server's last tagged release is 2021-10-21 and its last
+repository push 2023-07-17. The Helm chart repository the docs instruct you to add
+(https://charts.vapor.io) failed TLS verification and returned HTTP 403 when probed on
+2026-09-02 — do not expect `helm repo add synse https://charts.vapor.io` to work.
+
+## Protocol coverage (plugins)
+
+IPMI, SNMP (including the RFC 1628 UPS MIB), Modbus over TCP/IP, Intel AMT, Juniper JTI,
+OpenConfig, plus an emulator. The northbound API is deliberately protocol-agnostic: a
+temperature sensor over RS-485 is read exactly the way a BMC over IPMI is.
+
+## Not published
+
+No OpenAPI. No AsyncAPI. No GraphQL. No MCP server. No A2A agent card. No webhooks. No
+llms.txt of their own. No /.well-known/ documents on any host. No status page. No public
+pricing (https://www.vapor.io/pricing/ returns HTTP 500). No published SOC 2 / ISO 27001 /
+other certification. No security.txt or vulnerability disclosure program.
+
+## Company
+
+- Website: https://www.vapor.io/
+- Grid Platform: https://www.vapor.io/grid-platform/
+- Kinetic Grid Portal: https://www.vapor.io/technology/kinetic-grid-portal/
+- Blog: https://www.vapor.io/resources/blog/ (RSS: https://www.vapor.io/feed/)
+- Press releases: https://www.vapor.io/resources/press-releases/
+- Contact: https://www.vapor.io/contact/
+- Legal index: https://www.vapor.io/legal/
+- Terms of use: https://www.vapor.io/legal/website-terms-of-use/
+- Privacy policy: https://www.vapor.io/legal/privacy-policy/

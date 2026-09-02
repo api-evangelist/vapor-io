@@ -1,0 +1,84 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/releases/ + GitHub releases API for the vapor-ware org
+provider: Vapor IO
+scheme: semver
+policy: https://synse.readthedocs.io/en/latest/releases/
+note: 'Vapor IO publishes no dated product changelog page. Release notes live on each Synse component''s
+  GitHub releases page, which the releases policy explicitly names as the place to look: ''See the releases
+  page on a project''s GitHub repository for release notes and any build artifacts for that component.''
+  The entries below are the most recent tagged releases read from the GitHub releases API on 2026-09-02,
+  not a narrative changelog.'
+sources:
+- component: synse-server
+  url: https://github.com/vapor-ware/synse-server/releases
+- component: synse-cli
+  url: https://github.com/vapor-ware/synse-cli/releases
+- component: synse-sdk
+  url: https://github.com/vapor-ware/synse-sdk/releases
+- component: synse-server-grpc
+  url: https://github.com/vapor-ware/synse-server-grpc/releases
+- component: synse-client-go
+  url: https://github.com/vapor-ware/synse-client-go/releases
+- component: synse-client-python
+  url: https://github.com/vapor-ware/synse-client-python/releases
+current_version:
+  component: synse-server
+  version: v3.4.2
+  date: '2021-10-21'
+entries:
+- component: synse-cli
+  version: v3.0.1
+  date: '2023-09-19'
+  breaking: false
+- component: synse-client-go
+  version: v1.1.0
+  date: '2022-08-18'
+  breaking: false
+- component: synse-sdk
+  version: v2.1.2
+  date: '2022-07-22'
+  breaking: false
+- component: synse-server
+  version: v3.4.2
+  date: '2021-10-21'
+  breaking: false
+- component: synse-server
+  version: v3.4.1
+  date: '2021-09-30'
+  breaking: false
+- component: synse-server
+  version: v3.4.0
+  date: '2021-09-14'
+  breaking: false
+  highlights: Last minor release of the API server.
+- component: synse-server
+  version: v3.3.0
+  date: '2021-08-09'
+  breaking: false
+- component: synse-client-python
+  version: 1.0.1
+  date: '2021-01-21'
+  breaking: false
+- component: synse-server-grpc
+  version: 3.1.0
+  date: '2021-01-19'
+  breaking: false
+  highlights: Current version of the published Protocol Buffers contract.
+- component: synse-server-grpc
+  version: 3.0.0
+  date: '2020-03-27'
+  breaking: true
+  highlights: Synse v3 line; the releases policy reserves major versions for breaking API changes.
+retired_surfaces:
+- name: Synse GraphQL
+  image: vaporio/synse-graphql
+  last_published: '2019-01-14'
+  pulls_at_probe: 27369
+  status: retired
+  note: >-
+    A GraphQL frontend for the Synse v2 API was distributed as vaporio/synse-graphql (27,369
+    pulls). No synse-graphql repository exists in the vapor-ware organization today, the image
+    has not been pushed since 2019-01-14, and the v3 documentation never mentions GraphQL. An
+    org-wide code search for .graphql files returns zero results. Recorded so the image is not
+    mistaken for a live GraphQL surface.

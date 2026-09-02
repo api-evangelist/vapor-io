@@ -1,0 +1,25 @@
+generated: '2026-09-02'
+method: searched
+source: https://synse.readthedocs.io/en/latest/server/api.v3/
+provider: Vapor IO
+api: Synse Server API (v3)
+limit_count: 0
+headers: []
+status_on_exhaustion: null
+note: 'Synse Server documents no rate limits. There is no limit, no window, no burst, no X-RateLimit-*/RateLimit-*
+  response header, no Retry-After and no 429 anywhere in the v3 API reference — the documented error codes
+  are 400, 404, 405 and 500 only. This is consistent with the deployment model: Synse is self-hosted software
+  the operator runs on their own infrastructure, so throughput is bounded by that deployment rather than
+  by a vendor quota. The related runtime controls the docs DO publish are a plugin request timeout and
+  a reading-cache TTL, both operator-configured, not caller-facing. An honest zero, not a gap in the probe.'
+related_controls:
+- name: plugin backoff
+  detail: A plugin that fails a request is marked inactive so later requests do not block on it, and reconnection
+    is retried in a background task with exponential backoff.
+  docs: https://synse.readthedocs.io/en/latest/server/user/advanced/
+- name: reading cache TTL
+  detail: Transaction ids and cached readings expire after a configurable TTL.
+  docs: https://synse.readthedocs.io/en/latest/server/user/configuration/
+kinetic_grid:
+  limit_count: 0
+  note: The Kinetic Grid Portal API is customer-only; no limits are published.
