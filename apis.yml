@@ -12,6 +12,22 @@ description: 'Vapor IO is an Austin, Texas edge computing company that builds an
   SNMP, Modbus over TCP/IP, Intel AMT and Juniper JTI, with Go and Python SDKs, a Go
   CLI, Helm charts and Docker images. Kinetic Grid Portal telemetry is described as
   API-accessible but is documented only to customers.'
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - vapor-ware/synse-server
+    - vapor-ware/synse-server-grpc
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://www.vapor.io/wp-content/uploads/2021/06/cropped-1-Fav.png
 url: https://raw.githubusercontent.com/api-evangelist/vapor-io/refs/heads/main/apis.yml
 x-type: company
@@ -22,7 +38,7 @@ modified: '2026-09-02'
 tags:
 - Company
 - Edge Computing
-- Data-Center
+- Data Center
 - Colocation
 - Infrastructure
 - Device Management
@@ -30,7 +46,7 @@ tags:
 - Telemetry
 - IoT
 - gRPC
-- Open-Source
+- Open Source
 - Kubernetes
 tags_raw:
 - Company
@@ -45,6 +61,8 @@ tags_raw:
 - gRPC
 - Open Source
 - Kubernetes
+- Data-Center
+- Open-Source
 apis:
 - aid: vapor-io:synse-server
   name: Synse Server API (v3)
