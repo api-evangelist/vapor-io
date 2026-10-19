@@ -1,0 +1,115 @@
+edges:
+- partner_name: Go module proxy
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official SDK (Go)
+  evidence: https://pkg.go.dev/github.com/vapor-ware/synse-cli
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Go module proxy (public registry JSON)
+    spec_file: null
+    language: Go
+    packages:
+    - name: github.com/vapor-ware/synse-cli
+      version: v0.0.0-20231003151803-3b234208878a
+      released: '2023-10-03'
+      released_field: Time
+      lapsed: true
+      page: https://pkg.go.dev/github.com/vapor-ware/synse-cli
+      repo_leg: github-org:vapor-ware
+      publisher_leg: org:vapor-ware
+      matched_by: github-org
+    - name: github.com/vapor-ware/synse-client-go
+      version: v1.1.0
+      released: '2022-08-18'
+      released_field: Time
+      lapsed: true
+      page: https://pkg.go.dev/github.com/vapor-ware/synse-client-go
+      repo_leg: github-org:vapor-ware
+      publisher_leg: org:vapor-ware
+      matched_by: github-org
+    - name: github.com/vapor-ware/synse-sdk
+      version: v0.1.0-alpha
+      released: '2017-10-26'
+      released_field: Time
+      lapsed: true
+      page: https://pkg.go.dev/github.com/vapor-ware/synse-sdk
+      repo_leg: github-org:vapor-ware
+      publisher_leg: org:vapor-ware
+      matched_by: github-org
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: PyPI
+  partner: pypi
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Python)
+  evidence: https://pypi.org/project/kubetest/
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: PyPI (public registry JSON)
+    spec_file: null
+    language: Python
+    packages:
+    - name: kubetest
+      version: 0.9.5
+      released: '2021-03-24'
+      released_field: upload_time
+      lapsed: true
+      page: https://pypi.org/project/kubetest/
+      repo_leg: github-org:vapor-ware
+      publisher_leg: email:vapor.io
+      matched_by: domain
+    - name: synse
+      version: 1.0.1
+      released: '2021-01-21'
+      released_field: upload_time
+      lapsed: true
+      page: https://pypi.org/project/synse/
+      repo_leg: github-org:vapor-ware
+      publisher_leg: email:vapor.io
+      matched_by: domain
+    - name: synse-grpc
+      version: 3.1.0
+      released: '2021-01-19'
+      released_field: upload_time
+      lapsed: true
+      page: https://pypi.org/project/synse-grpc/
+      repo_leg: github-org:vapor-ware
+      publisher_leg: email:vapor.io
+      matched_by: domain
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+generated: '2026-10-18'
+method: searched
+source:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
+checked:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
